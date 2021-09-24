@@ -1,0 +1,9 @@
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\VertexParserDomain.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\VertexParserDomain.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\NXOpen.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\NXOpen.Utilities.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexParserDomain.csproj.CoreCompileInputs.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexParserDomain.csproj.CopyComplete
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexParserDomain.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexParserDomain.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexParserDomain.csproj.AssemblyReference.cache

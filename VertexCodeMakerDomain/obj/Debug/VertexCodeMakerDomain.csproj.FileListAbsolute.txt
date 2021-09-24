@@ -1,0 +1,14 @@
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\VertexCodeMakerDomain.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\VertexCodeMakerDomain.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\NXOpen.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\bin\Debug\NXOpen.Utilities.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexCodeMakerDomain.csproj.CoreCompileInputs.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexCodeMakerDomain.csproj.CopyComplete
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexCodeMakerDomain.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\VertexParserDomain\obj\Debug\VertexCodeMakerDomain.pdb
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\bin\Debug\VertexCodeMakerDomain.dll
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\bin\Debug\VertexCodeMakerDomain.pdb
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.csproj.CoreCompileInputs.cache
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.csproj.CopyComplete
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.dll
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.pdb

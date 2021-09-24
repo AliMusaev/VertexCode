@@ -1,0 +1,16 @@
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\NxCustomLib.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\NxCustomLib.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\VertexParserDomain.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\Wpf.exe
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\OxyPlot.Wpf.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\OxyPlot.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\VertexParserDomain.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\Wpf.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\Wpf.exe.config
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\OxyPlot.Wpf.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\x64\Debug\OxyPlot.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\x64\Debug\NxCustomLib.csproj.AssemblyReference.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\x64\Debug\NxCustomLib.csproj.CoreCompileInputs.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\x64\Debug\NxCustomLib.csproj.CopyComplete
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\x64\Debug\NxCustomLib.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\x64\Debug\NxCustomLib.pdb

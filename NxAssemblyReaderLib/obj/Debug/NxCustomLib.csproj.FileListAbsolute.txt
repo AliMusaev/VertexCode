@@ -1,0 +1,17 @@
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NxCustomLib.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NxCustomLib.pdb
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.Guide.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.UF.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.Utilities.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpenUI.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.Guide.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.UF.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpen.Utilities.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\bin\Debug\NXOpenUI.xml
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\Debug\NxCustomLib.csproj.AssemblyReference.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\Debug\NxCustomLib.csproj.CoreCompileInputs.cache
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\Debug\NxCustomLib.csproj.CopyComplete
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\Debug\NxCustomLib.dll
+C:\Users\musaev.ae\source\repos\NxCustomLib\NxCustomLib\obj\Debug\NxCustomLib.pdb

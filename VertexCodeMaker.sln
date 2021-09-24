@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxAssemblyReaderLib", "NxAssemblyReaderLib\NxAssemblyReaderLib.csproj", "{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualControlApp", "VisualControlApp\VisualControlApp.csproj", "{2E1F8225-D036-4901-9606-90F74251D291}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VertexCodeMakerDomain", "VertexCodeMakerDomain\VertexCodeMakerDomain.csproj", "{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Debug|x64.ActiveCfg = Debug|x64
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Debug|x64.Build.0 = Debug|x64
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Release|x64.ActiveCfg = Release|x64
+		{21969DA9-61A7-4B32-994A-6DA9EAD22ECF}.Release|x64.Build.0 = Release|x64
+		{2E1F8225-D036-4901-9606-90F74251D291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Debug|x64.Build.0 = Debug|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Release|x64.ActiveCfg = Release|Any CPU
+		{2E1F8225-D036-4901-9606-90F74251D291}.Release|x64.Build.0 = Release|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{4CA2F6B4-46E7-4557-AEC6-14A32B9450DA}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF9BCD56-74E9-46B0-9FEC-48E50806CD3D}
+	EndGlobalSection
+EndGlobal
