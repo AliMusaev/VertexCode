@@ -9,12 +9,13 @@ namespace VertexCodeMakerDomain
 {
     public class VertexFrame
     {
-        public string Name { get; }
+        public string FrameName { get; }
+        public string FrameId { get; set; }
         public string CabinName { get; }
         private List<VertexSection> _sectionsList;
         public VertexFrame(List<VertexSection> sections, string name, string cabinName = "empty")
         {
-            Name = name;
+            FrameName = name;
             CabinName = cabinName;
             _sectionsList = sections;
         }
@@ -26,7 +27,7 @@ namespace VertexCodeMakerDomain
         {
             foreach (var item in commands)
             {
-                _sectionsList.Find(x => x.SectionName == item.ParentName).CommandsCollection.Add(item);
+                _sectionsList.Find(x => x.SectionName == item.ParentName).AddCommand(item);
             }
         }
         public IDirectable GetSectionDirectionByName(string name)

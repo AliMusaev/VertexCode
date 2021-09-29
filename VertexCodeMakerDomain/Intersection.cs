@@ -10,12 +10,13 @@ namespace VertexCodeMakerDomain
 {
     public class Intersection
     {
-        public Point2d InterPoint { get; }
-        public string Section1Name { get; private  set; }
-        public string Section2Name { get; private set; }
-        public bool IsOrthogonal { get;  }
-       
-        public static Intersection Create(ISectionable sect1, ISectionable sect2)
+        public Point2d InterPoint { get; private set; }
+        public VertexSection Section1 { get; private  set; }
+        public VertexSection Section2 { get; private set; }
+        public double [] Segments { get; private set; }
+        public bool IsOrthogonal { get; private set; }
+        public IntersectionType Type { get; private set; }
+        public static Intersection Create(VertexSection sect1, VertexSection sect2)
         {
             var line1 = sect1;
             var line2 = sect2;
@@ -35,18 +36,72 @@ namespace VertexCodeMakerDomain
             if (u < 0 || u > 1)
                 return null;
 
-            return new Intersection(new Point2d(line1.StartPoint.X + t * b.X, line1.StartPoint.Y + t * b.Y).Round(5), sect1 as VertexSection, sect2 as VertexSection);
+            return new Intersection(new Point2d(line1.StartPoint.X + t * b.X, line1.StartPoint.Y + t * b.Y).Round(5), sect1, sect2);
         }
         private Intersection(Point2d intePoint, VertexSection section1, VertexSection section2)
         {
             InterPoint = intePoint;
-            Section1Name = section1.SectionName;
-            Section2Name = section2.SectionName;
-            IsOrthogonal = DefineOrthogonalBetween(section1, section2);
+            Section1 = section1;
+            Section2 = section2;
+            IsOrthogonal = DefineOrthogonalBetween();
+            Segments = DefineSegments();
+            Type = DefineType();
+            
         }
-        private bool DefineOrthogonalBetween(IAngle sect1Angles, IAngle sect2Angles)
+        private IntersectionType DefineType()
         {
-            if (sect1Angles.IsOrthogonal && sect2Angles.IsOrthogonal)
+            int shortsCount = CalcShortsCount();
+            if (shortsCount == 1)
+            {
+                return IntersectionType.Tee;
+            }
+            else if (shortsCount == 2)
+            {
+                return IntersectionType.Angular;
+            }
+            else if (shortsCount == 0)
+            {
+                return IntersectionType.Сruciform;
+            }
+            else
+            {
+                throw new Exception($"{shortsCount} segments have length <= {Section1.Height}(for {Section1.SectionName}) or <= {Section2.Height}(for {Section2.SectionName})\n" +
+                    $"Cant defined intersection type");
+            }
+        }
+        private int CalcShortsCount()
+        {
+            int shortsCount = 0;
+            if (Segments[0] <= Section1.Height)
+            {
+                shortsCount++;
+            }
+            if (Segments[1] <= Section1.Height)
+            {
+                shortsCount++;
+            }
+            if (Segments[2] <= Section2.Height)
+            {
+                shortsCount++;
+            }
+            if (Segments[3] <= Section2.Height)
+            {
+                shortsCount++;
+            }
+            return shortsCount;
+        }
+        private double[] DefineSegments()
+        {
+            var values = new double[4];
+            values[0] = Math.Round(CalcLength(Section1.StartPoint, InterPoint),3);
+            values[1] = Math.Round(CalcLength(InterPoint, Section1.EndPoint),3);
+            values[2] = Math.Round(CalcLength(Section2.StartPoint, InterPoint),3);
+            values[3] = Math.Round(CalcLength(InterPoint, Section2.EndPoint),3);
+            return values;
+        }
+        private bool DefineOrthogonalBetween()
+        {
+            if (Section1.IsOrthogonal && Section2.IsOrthogonal)
             {
                 return true;
             }
@@ -54,9 +109,13 @@ namespace VertexCodeMakerDomain
         }
         public void RotateSections()
         {
-            var temp = Section1Name;
-            Section1Name = Section2Name;
-            Section2Name = temp;
+            var temp = Section1;
+            Section1 = Section2;
+            Section2 = temp;
+        }
+        private double CalcLength(Point2d first, Point2d second)
+        {
+            return Math.Sqrt(Math.Pow(second.X - first.X, 2) + Math.Pow(second.Y - first.Y, 2));
         }
     }
 }

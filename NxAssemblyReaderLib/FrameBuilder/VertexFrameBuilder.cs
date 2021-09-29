@@ -1,4 +1,5 @@
-﻿using NXOpen;
+﻿using NLog;
+using NXOpen;
 using NXOpen.Assemblies;
 using NXOpen.Features;
 using NXOpenUI;
@@ -14,6 +15,7 @@ namespace NxAssemblyReaderLib.FrameBuilder
 {
     class VertexFrameBuilder
     {
+        private Logger _logger = LogManager.GetCurrentClassLogger();
         public VertexFrameBuilder()
         {
          
@@ -49,17 +51,35 @@ namespace NxAssemblyReaderLib.FrameBuilder
             List<VertexSection> retVal = new List<VertexSection>();
             foreach (var component in components)
             {
+                //var c = component.GetAttributeTitlesByType(NXObject.AttributeType.String);
+                //foreach (var item in c)
+                //{
+                //    MessageBox.Show($"{item}");
+                //}
                 // If component name is not assembly name (ignore assembly component)
-                if (component.OwningPart.Name != component.Name)
+
+                var name = FindPartName(component);
+                if (component.OwningPart.Name != name)
                 {
-                    var baseSection = sections.Find(x => x.SectionName.Equals(component.Name, StringComparison.OrdinalIgnoreCase)).Clone() as BaseSection;
+                    var baseSection = sections.Find(x => x.SectionName.Equals(name, StringComparison.OrdinalIgnoreCase)).Clone() as BaseSection;
                     component.GetPosition(out Point3d point, out Matrix3x3 matrix);
                     retVal.Add(sectionBuilder.BuildSectionBy(baseSection, point, matrix, axis));
                 }
             }
             return retVal;
         }
-
+        private string FindPartName(Component part)
+        {
+            try
+            {
+                return part.GetUserAttributeAsString("DB_PART_NAME", NXObject.AttributeType.String, -1);
+            }
+            catch (NXException ex)
+            {
+                _logger.Warn(ex, "DB name not found");
+            }
+            return part.Name;
+        }
         private List<Intersection> FindIntersections(List<VertexSection> sections)
         {
             List<Intersection> intersections = new List<Intersection>();
@@ -84,14 +104,11 @@ namespace NxAssemblyReaderLib.FrameBuilder
         private List<VertexCommand> StandartFeaturesFinder(List<Intersection> intersections, VertexFrame frame)
         {
             var commands = new List<VertexCommand>();
-            StandartFeaturesFinder featuresCreator = new StandartFeaturesFinder();
             foreach (var intersection in intersections)
             {
-                commands.AddRange(featuresCreator.FindFeaturesIn(intersection, frame));
+                commands.AddRange(new StandartFeaturesFinder(intersection, frame).FindFeaturesIn());
             }
             return commands;
-           
-
         }
 
     }

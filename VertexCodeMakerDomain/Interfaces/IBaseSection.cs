@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace VertexCodeMakerDomain.Interfaces
 {
-    public interface IBaseSection : IMeasurable
+    public interface IBaseSection : IMeasurable, IReadException
     {
         string SectionName { get; }
-        List<VertexCommand> CommandsCollection { get; }
+        int SectionId { get; set; }
+        IReadOnlyList<VertexCommand> CommandsCollection { get; }
     }
 }

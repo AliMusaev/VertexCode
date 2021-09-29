@@ -1,4 +1,5 @@
-﻿using NXOpen;
+﻿using NLog;
+using NXOpen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,225 +13,236 @@ namespace NxAssemblyReaderLib.FrameBuilder
 {
     class StandartFeaturesFinder
     {
-      
-        public List<VertexCommand> FindFeaturesIn(Intersection intersection, VertexFrame frame)
+        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private Intersection _intersection;
+        private double _height;
+        private List<VertexCommand> _commands;
+        public StandartFeaturesFinder(Intersection intersection, VertexFrame frame)
         {
-            List<VertexCommand> commands = new List<VertexCommand>();
-            double H = DefineH(intersection,
-                               frame.GetSectionMeasurementsBy(intersection.Section1Name),
-                               frame.GetSectionAnglesByName(intersection.Section1Name),
-                               frame.GetSectionDirectionByName(intersection.Section2Name)
-                               );
+            _intersection = intersection;
+            _commands = new List<VertexCommand>();
+        }
+        public List<VertexCommand> FindFeaturesIn()
+        {
 
-            double[] values;
-            string result;
+            _height = Math.Round(DefineHeight(),3);
 
-            do
+            if (_intersection.Type == IntersectionType.Angular)
             {
-                result = DefineType(H,
-                                    intersection,
-                                    frame.GetSectionPointsByName(intersection.Section1Name),
-                                    frame.GetSectionPointsByName(intersection.Section2Name),
-                                    frame.GetSectionDirectionByName(intersection.Section1Name),
-                                    frame.GetSectionDirectionByName(intersection.Section2Name),
-                                    out values
-                                    );
-            } while (result == "RepeatLip");
-           
-
-
-            if (result == "Lip")
-            {
-                commands.AddRange(AddLip(intersection,
-                                    H,
-                                    values,
-                                    frame.GetSectionAnglesByName(intersection.Section1Name),
-                                    frame.GetSectionPointsByName(intersection.Section2Name),
-                                    frame.GetSectionMeasurementsBy(intersection.Section1Name).Height
-                                    ));
+                AddAngularFeatures();
             }
-            else if (result == "Notch")
+            if (_intersection.Type == IntersectionType.Сruciform)
             {
-                commands.AddRange(AddNotch(intersection, values, H, false));
+                AddСruciformFeatures();
             }
-            else if (result == "Notch1")
+            if (_intersection.Type == IntersectionType.Tee)
             {
-                commands.AddRange(AddNotch(intersection, values, H, true));
+                AddTeeFeatures();
+            }
+            AddDimple();
+            AddChamfer();
+
+            return _commands;
+        }
+        // Define section1 half hight with angular bias
+        private void AddTeeFeatures()
+        {
+            if (!_intersection.IsOrthogonal)
+            {
+                DefineAngularTeeFeatures();
             }
             else
             {
-                //throw new Exception();
-            }
-            // Dimples
-            commands.Add(new VertexCommand(intersection.Section1Name, Operations.Dimple, values[0]));
-            commands.Add(new VertexCommand(intersection.Section2Name, Operations.Dimple, values[2]));
-            commands.AddRange(AddChamfer(intersection,
-                       frame.GetSectionAnglesByName(intersection.Section1Name),
-                       frame.GetSectionAnglesByName(intersection.Section2Name),
-                       frame.GetSectionMeasurementsBy(intersection.Section1Name),
-                       frame.GetSectionMeasurementsBy(intersection.Section2Name)
-                       ));
-
-            return commands;
-        }
-        private double DefineH(Intersection intersect, IMeasurable sect1Measurements, IAngle sect1Angles, IDirectable sect2Directable )
-        {
-            if (intersect.IsOrthogonal)
-            {
-                return sect1Measurements.Height / 2;
-            }
-            else
-            {
-                return CalcHypotenuse(sect2Directable.Direction, sect1Angles.CosX, sect1Angles.SinX, sect1Measurements.Height / 2);
-            }
-        }
-        private string DefineType(double H, Intersection intersection, ISectionable sect1Points, ISectionable sect2Points, IDirectable d1, IDirectable d2, out double[] values)
-        {
-            values = GetValues(intersection.InterPoint, sect1Points, sect2Points);
-            if (values[0] >= H && values[1] >= H && values[2] >= H && values[3] >= H)
-            {
-                if (intersection.IsOrthogonal)
-                {
-                    double horMax = 0;
-                    double verMax = 0;
-                    double horMin = 0;
-                    double verMin = 0;
-                    double delta = H / 2;
-                    ShelvsDirection verDirect = ShelvsDirection.Undefined;
-                    if ((d1.Direction == ShelvsDirection.D || d1.Direction == ShelvsDirection.U) && (d2.Direction == ShelvsDirection.L || d2.Direction == ShelvsDirection.R))
-                    {
-                        horMax = Math.Max(sect1Points.StartPoint.X, sect1Points.EndPoint.X);
-                        verMax = Math.Max(sect2Points.StartPoint.X, sect2Points.EndPoint.X);
-                        horMin = Math.Min(sect1Points.StartPoint.X, sect1Points.EndPoint.X);
-                        verMin = Math.Min(sect2Points.StartPoint.X, sect2Points.EndPoint.X);
-                        verDirect = d2.Direction;
-                    }
-                    else if ((d2.Direction == ShelvsDirection.D || d2.Direction == ShelvsDirection.U) && (d1.Direction == ShelvsDirection.L || d1.Direction == ShelvsDirection.R))
-                    {
-
-                        horMax = Math.Max(sect2Points.StartPoint.X, sect2Points.EndPoint.X);
-                        verMax = Math.Max(sect1Points.StartPoint.X, sect1Points.EndPoint.X);
-                        horMin = Math.Min(sect2Points.StartPoint.X, sect2Points.EndPoint.X);
-                        verMin = Math.Min(sect1Points.StartPoint.X, sect1Points.EndPoint.X);
-                        verDirect = d1.Direction;
-                    }
-                    if (horMax <= (verMax + H) && horMax > (verMax + delta) && verDirect == ShelvsDirection.R)
-                    {
-                        return "Notch1";
-                    }
-                    else if (horMin >= (verMin - H) && horMin < (verMin - delta) && verDirect == ShelvsDirection.L)
-                    {
-                        return "Notch1";
-                    }
-
-
-                }
-
-                return "Notch";
+                DefineSectionPosition();
             }
             
 
-            if (values[0] < H && values[0] < values[1] && values[0] < values[2] && values[0] < values[3])
+        }
+        private void AddСruciformFeatures()
+        {
+            if (_intersection.Section1.Direction == ShelvsDirection.U || _intersection.Section1.Direction == ShelvsDirection.D)
             {
-                return "Lip";
+                _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Notch, _intersection.Segments[0]));
+                _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Lip, _intersection.Segments[0]));
             }
-            if (values[1] < H && values[1] < values[0] && values[1] < values[2] && values[1] < values[3])
+            else if (_intersection.Section1.Direction == ShelvsDirection.R || _intersection.Section1.Direction == ShelvsDirection.L)
             {
-                return "Lip";
-            }
-            if (values[2] < H && values[2] < values[1] && values[2] < values[0] && values[2] < values[3])
-            {
-                intersection.RotateSections();
-                return "RepeatLip";
-            }
-            if (values[3] < H && values[3] < values[0] && values[3] < values[2] && values[3] < values[1])
-            {
-                intersection.RotateSections();
-                return "RepeatLip";
+                _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Notch, _intersection.Segments[2]));
+                _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Lip, _intersection.Segments[2]));
             }
             else
             {
-                return "";
+                throw new Exception();
             }
         }
-        private List<VertexCommand> AddChamfer(Intersection intersect, IAngle sect1, IAngle sect2, IMeasurable sect1Measurenment, IMeasurable sect2Measurenment)
+        private void AddAngularFeatures()
         {
-            var commands = new List<VertexCommand>();
-            if (!sect1.IsOrthogonal)
+            
+            if (_intersection.Segments[0] < _height || _intersection.Segments[1] < _height)
             {
-                commands.AddRange(CreateChamfer(intersect.Section1Name, sect1Measurenment.Width));
+                _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Lip, _intersection.Segments[2]));
             }
-            if (!sect2.IsOrthogonal)
+            else if (_intersection.Segments[2] < _height || _intersection.Segments[3] < _height) 
             {
-                commands.AddRange(CreateChamfer(intersect.Section2Name, sect2Measurenment.Width));
-            }
-            return commands;
-        }
-        private List<VertexCommand> CreateChamfer(string name, double width)
-        {
-          
-            var commands = new List<VertexCommand>();
-            commands.Add(new VertexCommand(name, Operations.Chamfer, 0));
-            commands.Add(new VertexCommand(name, Operations.Chamfer, width));
-            // Rule 2
-            //commands.Add(new VertexCommand(name, Operations.Swage, 33));
-            //commands.Add(new VertexCommand(name, Operations.Swage, width-33));
-            return commands;
-        }
-        private List<VertexCommand> AddNotch(Intersection intersect, double[] values, double H, bool n1)
-        {
-            var commands = new List<VertexCommand>();
-            if (n1)
-            {
-                commands.Add(new VertexCommand(intersect.Section2Name, Operations.Notch, values[2]));
+                _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Lip, _intersection.Segments[0]));
             }
             else
             {
-                commands.Add(new VertexCommand(intersect.Section1Name, Operations.Notch, values[0]));
-                commands.Add(new VertexCommand(intersect.Section1Name, Operations.Lip, values[0]));
+                throw new Exception();
             }
-            return commands;
         }
-        private double[] GetValues(Point2d intersectPoint, ISectionable sect1Points, ISectionable sect2Points)
+        private void AddDimple()
         {
-            var values = new double[4];
-            values[0] = CalcLength(sect1Points.StartPoint, intersectPoint);
-            values[1] = CalcLength(intersectPoint, sect1Points.EndPoint);
-            values[2] = CalcLength(sect2Points.StartPoint, intersectPoint);
-            values[3] = CalcLength(intersectPoint, sect2Points.EndPoint);
-            return values;
+            _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Dimple, _intersection.Segments[0]));
+            _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Dimple, _intersection.Segments[2]));
         }
-        private List<VertexCommand> AddLip(Intersection intersect, double H, double[] values, IAngle sect1Angles, ISectionable sect2Points, double sect1Height)
+        private void AddChamfer()
         {
-            List<VertexCommand> commands = new List<VertexCommand>();
-            double cutoutLength = Math.Abs(sect1Height / sect1Angles.CosY);
+            if (!_intersection.Section1.IsOrthogonal)
+            {
+                _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Chamfer, 0));
+                _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Chamfer, _intersection.Section1.Width));
+                return;
+            }
+            if (!_intersection.Section2.IsOrthogonal)
+            {
+                _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Chamfer, 0));
+                _commands.Add(new VertexCommand(_intersection.Section2.SectionName, Operations.Chamfer, _intersection.Section2.Width));
+                return;
+            }
+        }
+        private void DefineSectionPosition()
+        {
+            if (_intersection.Segments[0] > _height && _intersection.Segments[1] > _height)
+            {
+                AddFeatureInSecondSection(DefineSectionPosRelativeIntersectionPoint(_intersection.Section2, _intersection.Segments[2], _intersection.Segments[3]), _intersection.Section1, _intersection.Segments[0]);
+            }
+            else if (_intersection.Segments[2] > _height && _intersection.Segments[3] > _height)
+            {
+                AddFeatureInSecondSection(DefineSectionPosRelativeIntersectionPoint(_intersection.Section1, _intersection.Segments[0], _intersection.Segments[1]), _intersection.Section2, _intersection.Segments[2]);
 
-            if (intersect.IsOrthogonal)
+            }
+        }
+        private void AddFeatureInSecondSection(string pos, VertexSection sect, double value)
+        {
+            if (pos == "right")
             {
-                    commands.Add(new VertexCommand(intersect.Section2Name, Operations.Lip, values[2]));
+                if (sect.Direction == ShelvsDirection.L)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                }
+                if (sect.Direction == ShelvsDirection.R)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                }
+            }
+            if (pos == "left")
+            {
+                if (sect.Direction == ShelvsDirection.L)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                }
+                if (sect.Direction == ShelvsDirection.R)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                }
+            }
+            if (pos == "up")
+            {
+                if (sect.Direction == ShelvsDirection.U)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                }
+                else if (sect.Direction == ShelvsDirection.D)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                }
+            }
+            if (pos == "down")
+            {
+                if (sect.Direction == ShelvsDirection.U)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                }
+                else if (sect.Direction == ShelvsDirection.D)
+                {
+                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                }
+            }
+        }
+        private string DefineSectionPosRelativeIntersectionPoint(VertexSection section, double segment1, double segment2)
+        {
+
+            if (section.StartPoint.X > _intersection.InterPoint.X && section.EndPoint.X < _intersection.InterPoint.X)
+            {
+                if (segment1 <= _height && segment2 > _height)
+                {
+                    return "left";
+                }
+                return "right";
+
+            }
+            else if (section.StartPoint.X < _intersection.InterPoint.X && section.EndPoint.X > _intersection.InterPoint.X)
+            {
+                if (segment1 <= _height && segment2 > _height)
+                {
+                    return "right";
+                }
+                return "left";
+            }
+            if (section.StartPoint.Y > _intersection.InterPoint.Y && section.EndPoint.Y < _intersection.InterPoint.Y)
+            {
+                if (segment1 <= _height && segment2 > _height)
+                {
+                    return "down";
+                }
+                return "up";
+            }
+            else if (section.StartPoint.Y < _intersection.InterPoint.Y && section.EndPoint.Y > _intersection.InterPoint.Y)
+            {
+                if (segment1 <= _height && segment2 > _height)
+                {
+                    return "up";
+                }
+                return "down";
+            }
+            throw new Exception();
+
+        }
+        private void DefineAngularTeeFeatures()
+        {
+            if (!_intersection.Section1.IsOrthogonal)
+            {
+                CreateFeatures(_intersection.Section1, _intersection.Section2, _intersection.Segments[0], _intersection.Segments[1]);
+            }
+            else if (!_intersection.Section2.IsOrthogonal)
+            {
+                CreateFeatures(_intersection.Section2, _intersection.Section1, _intersection.Segments[2], _intersection.Segments[3]);
+            }
+            else
+                throw new Exception();
+           
+        }
+        private void CreateFeatures(VertexSection section, VertexSection section1, double segment1, double segment2)
+        {
+            double cutoutLength = Math.Abs(section.Height / section.CosY);
+            Point2d midPoint;
+            if (segment1 < _height)
+            {
+                midPoint = DefineElementPoint(_height, section.CosX, section.SinX, _intersection.InterPoint);
+            }
+            else if (segment2 < _height)
+            {
+                midPoint = DefineElementPoint(_height, section.CosX, section.SinX, _intersection.InterPoint, true);
             }
             else
             {
-                Point2d midPoint;
-                if (values[0] < H)
-                {
-                    midPoint = DefineElementPoint(H, sect1Angles.CosX, sect1Angles.SinX, intersect.InterPoint);
-                }
-                else if (values[1] < H)
-                {
-                    midPoint = DefineElementPoint(H, sect1Angles.CosX, sect1Angles.SinX, intersect.InterPoint, true);
-                }
-                else
-                {
-                    MessageBox.Show("AAA");
-                    throw new Exception();
-                }
-                double value = CalcLength(sect2Points.StartPoint, midPoint);
-                commands.AddRange(CreateLips(cutoutLength, value, intersect.Section2Name));
-                
+                throw new Exception();
             }
-            return commands;
+            double value = CalcLength(section1.StartPoint, midPoint);
+            _commands.AddRange(CreateLips(cutoutLength, value, section1.SectionName));
         }
+      
         private List<VertexCommand> CreateLips(double cutoutLength, double pointPosition, string name)
         {
             // TODO: Add atribute instead of hard value
@@ -247,6 +259,7 @@ namespace NxAssemblyReaderLib.FrameBuilder
             }
             return commands;
         }
+       
         private Point2d DefineElementPoint(double hypotenuse, double firstCos, double firstSin, Point2d interPoint, bool isNegative = false)
         {
             if (!isNegative)
@@ -256,16 +269,28 @@ namespace NxAssemblyReaderLib.FrameBuilder
             return new Point2d(interPoint.X - (hypotenuse * firstCos), interPoint.Y - (hypotenuse * firstSin));
 
         }
-        private double CalcHypotenuse(ShelvsDirection direction, double cos, double sin, double sideA)
+        private double DefineHeight()
         {
-            double sideB;
-            if (direction == ShelvsDirection.U || direction == ShelvsDirection.D)
+            if (_intersection.IsOrthogonal)
             {
-                sideB = sideA / (sin / cos);
+                return _intersection.Section1.Height / 2;
             }
             else
             {
-                sideB = sideA / (cos / sin);
+                return CalcHypotenuse();
+            }
+        }
+        private double CalcHypotenuse()
+        {
+            double sideA = _intersection.Section1.Height / 2;
+            double sideB;
+            if (_intersection.Section2.Direction == ShelvsDirection.U || _intersection.Section2.Direction == ShelvsDirection.D)
+            {
+                sideB = sideA / (_intersection.Section1.SinX / _intersection.Section1.CosX);
+            }
+            else
+            {
+                sideB = sideA / (_intersection.Section1.CosX / _intersection.Section1.SinX);
             }
             return Math.Sqrt(Math.Pow(sideB, 2) + Math.Pow(sideA, 2));
         }

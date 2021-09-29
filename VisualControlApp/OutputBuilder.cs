@@ -11,81 +11,61 @@ namespace VisualControlApp
 {
     class OutputBuilder
     {
-        private ProfileMarker _marker;
-        public OutputBuilder()
-        {
 
-        }
-       
-        public string Build(VertexFrame frame)
+        public string Build(List<PresentVertexSection> sections, string cabinName, string frameName)
         {
-            _marker = new ProfileMarker();
-            string objname = "BoxName\n";
-            string retVal = objname;
+            string retVal = cabinName + "\n";
             
-            foreach (var section in frame.GetSections())
+            foreach (var section in sections)
             {
-                retVal += WriteSection(section, frame.Name);
+                retVal += WriteSection(section, frameName, cabinName);
             }
             return retVal;
         }
-       
-      
-        private string WriteSection(VertexSection section, string frameId)
+
+
+        private string WriteSection(PresentVertexSection section, string frameName, string cabinName)
         {
-            double GA = 0.6;
-            int quantity = 1;
-            string DE = $"{section.Mark}-{section.Direction} ";
-            string fill = $"IN= CABIN NAME " +
-                $"CU=Vertex Systems UK " +
-                $"GA={GA.ToString(CultureInfo.InvariantCulture)} " +
-                $"PR={section.SectionName} " +
-                $"PA={frameId} " +
-                $"QT={quantity} " +
-                $"MM=50 " +
-                $"DE=FIL\n";
-           string sectionText = $"IN= CABIN NAME " +
-                $"CU=Vertex Systems UK " +
-                $"GA={GA.ToString(CultureInfo.InvariantCulture)} " +
-                $"PR={section.SectionName} " +
-                $"PA={frameId} " +
-                $"QT={quantity} " +
-                $"MM={section.Width.ToString(CultureInfo.InvariantCulture)} " +
-                $"DE={DE} " +
-                $"X1={Math.Round(section.StartPoint.X,1).ToString(CultureInfo.InvariantCulture)} " +
-                $"Y1={Math.Round(section.StartPoint.Y,1).ToString(CultureInfo.InvariantCulture)} " +
-                $"X2={Math.Round(section.EndPoint.X,1).ToString(CultureInfo.InvariantCulture)} " +
-                $"Y2={Math.Round(section.EndPoint.Y,1).ToString(CultureInfo.InvariantCulture)} " +
-                $"HI={ChangeOrientation(section.Height, section.Direction).ToString(CultureInfo.InvariantCulture)}\n";
-            int counter = 0;
-            foreach (var item in section.CommandsCollection.OrderBy(x => x.Ordinate))
+            string retVal = null;
+            if (section.IsEmpty)
             {
-                if (counter == 2)
-                {
-                    sectionText += $"-1,100.0,{DE}\n";
-                }
-                sectionText += $"{item.Operation},{Math.Round(item.Ordinate,1).ToString(CultureInfo.InvariantCulture)}\n";
-                counter++;
-            }
-
-
-            if (section.CommandsCollection.Any(x => x.Operation == Operations.Chamfer))
-            {
-                return fill + sectionText + fill;
+                retVal = $"IN={cabinName} " +
+                         $"CU={section.CU} " +
+                         $"GA={section.GA.ToString(CultureInfo.InvariantCulture)} " +
+                         $"PR={section.SectionName} " +
+                         $"PA={frameName} " +
+                         $"QT={section.QT} " +
+                         $"MM={section.Width.ToString(CultureInfo.InvariantCulture)} " +
+                         $"DE={section.DE}\n";
             }
             else
             {
-                return sectionText;
+                retVal = $"IN={cabinName} " +
+              $"CU={section.CU} " +
+              $"GA={section.GA.ToString(CultureInfo.InvariantCulture)} " +
+              $"PR={section.SectionName} " +
+              $"PA={frameName} " +
+              $"QT={section.QT} " +
+              $"MM={section.Width.ToString(CultureInfo.InvariantCulture)} " +
+              $"DE={section.DE} " +
+              $"X1={Math.Round(section.X1, 1).ToString(CultureInfo.InvariantCulture)} " +
+              $"Y1={Math.Round(section.Y1, 1).ToString(CultureInfo.InvariantCulture)} " +
+              $"X2={Math.Round(section.X2, 1).ToString(CultureInfo.InvariantCulture)} " +
+              $"Y2={Math.Round(section.Y2, 1).ToString(CultureInfo.InvariantCulture)} " +
+              $"HI={section.HI.ToString(CultureInfo.InvariantCulture)}\n";
+
+                int counter = 0;
+                foreach (var item in section.CommandsCollection.OrderBy(x => x.Ordinate))
+                {
+                    if (counter == 2)
+                    {
+                        retVal += $"-1,100.0,{section.DE}\n";
+                    }
+                    retVal += $"{item.Operation},{Math.Round(item.Ordinate, 1).ToString(CultureInfo.InvariantCulture)}\n";
+                    counter++;
+                }
             }
+            return retVal;
         }
-        private double ChangeOrientation(double hight, ShelvsDirection direction)
-        {
-            if (direction == ShelvsDirection.D || direction == ShelvsDirection.L)
-            {
-                return hight * -1;
-            }
-            return hight;
-        }
-        
     }
 }

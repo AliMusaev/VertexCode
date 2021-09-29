@@ -11,8 +11,10 @@ namespace VertexCodeMakerDomain
 {
     public class VertexSection : IBaseSection, IAngle, IDirectable, ISectionable
     {
+        private List<VertexCommand> _commandsCollection;
         public string SectionName { get; }
-        public List<VertexCommand> CommandsCollection { get; }
+        public int SectionId { get; set; }
+        public IReadOnlyList<VertexCommand> CommandsCollection { get { return _commandsCollection.AsReadOnly(); } }
         public double Width { get; private set; }
         public double Height { get; private set; }
         public double Length { get; private set; }
@@ -27,15 +29,16 @@ namespace VertexCodeMakerDomain
         public ShelvsDirection Direction { get; private set; }
         public bool IsSwapped { get; set; }
         public string Mark { get; set; }
-        
+        public List<string> ExceptionsCollection { get; set; }
+
         public VertexSection(IBaseSection baseSection, Point2d starPoint, Point2d endPoint, double[] angles, ShelvsDirection direction)
         {
-            this.SectionName = $"{baseSection.SectionName} {Math.Round(starPoint.X),1}:{Math.Round(starPoint.Y),1} {Math.Round(endPoint.X),1}:{Math.Round(endPoint.Y),1}";
-            this.Width = baseSection.Width;
-            this.Height = baseSection.Height;
-            this.Length = baseSection.Length;
-            this.Thickness = baseSection.Thickness;
-            this.CommandsCollection = baseSection.CommandsCollection.Select(x => x.Clone() as VertexCommand).ToList();
+            SectionName = $"{baseSection.SectionName} {Math.Round(starPoint.X),1}:{Math.Round(starPoint.Y),1} {Math.Round(endPoint.X),1}:{Math.Round(endPoint.Y),1}";
+            Width = baseSection.Width;
+            Height = baseSection.Height;
+            Length = baseSection.Length;
+            Thickness = baseSection.Thickness;
+            _commandsCollection = baseSection.CommandsCollection.Select(x => x.Clone() as VertexCommand).ToList();
             CosX = angles[0];
             SinX = angles[1];
             CosY = angles[2];
@@ -43,7 +46,12 @@ namespace VertexCodeMakerDomain
             StartPoint = starPoint;
             EndPoint = endPoint;
             Direction = direction;
+            ExceptionsCollection = new List<string>(baseSection.ExceptionsCollection);
             IsOrthogonal = DefineOrthogonal(angles[0], angles[1]);
+        }
+        public void AddCommand(VertexCommand command)
+        {
+            _commandsCollection.Add(command.Clone() as VertexCommand);
         }
         private bool DefineOrthogonal(double angle1, double angle2)
         {
