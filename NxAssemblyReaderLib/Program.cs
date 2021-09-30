@@ -39,9 +39,10 @@ namespace NxAssemblyReaderLib
             // Load Nx session
             _ui = UI.GetUI();
             _session = Session.GetSession();
+            ErMessages = new List<ErrorMessage>();
 
-            
-           
+
+
         }
         private static void ConfigurateLoggger()
         {
@@ -69,7 +70,7 @@ namespace NxAssemblyReaderLib
             
 
 
-            MainWindow mainwindow = new MainWindow(frame);
+            MainWindow mainwindow = new MainWindow(frame, ErMessages);
             mainwindow.ShowDialog();
         }
 

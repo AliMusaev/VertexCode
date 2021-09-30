@@ -16,18 +16,18 @@ namespace VisualControlApp
         {
             _profileMarker = new ProfileMarker();
         }
-        public List<PresentVertexSection> AdaptData(VertexFrame frame)
+        public List<PresentVertexSection> AdaptData(VertexFrame frame, List<ErrorMessage> messages)
         {
 
             var retVal = new List<PresentVertexSection>();
             foreach (var item in frame.GetSections())
             {
 
-                retVal.Add(ConvertSection(item));
+                retVal.Add(ConvertSection(item, messages));
             }
             return retVal;
         }
-        private PresentVertexSection ConvertSection(VertexSection section)
+        private PresentVertexSection ConvertSection(VertexSection section, List<ErrorMessage> messages)
         {
             double GA = 0.6;
             int quantity = 1;
@@ -51,15 +51,32 @@ namespace VisualControlApp
             rSection.Length = section.Length;
             rSection.Height = section.Height;
             rSection.Thickness = section.Thickness;
+            rSection.ExtensionsString = FindErrorMessages(messages, section.SectionName);
             rSection.DE = $"{rSection.Mark}-{rSection.Direction}";
             rSection.CommandsCollection = ConvertCommands(section.CommandsCollection).OrderBy(x => x.Ordinate).ToList();
-            
+            if (rSection.ExtensionsString != null)
+            {
+                MessageBox.Show(rSection.ExtensionsString);
+                rSection.LoadWithError = true;
+            }
             return rSection;
 
         }
+        private string FindErrorMessages(List<ErrorMessage> messages, string sectName)
+        {
+            string retVal = null;
+            foreach (var item in messages)
+            {
+                if (item.SectId == sectName)
+                {
+                    retVal += item.Message + "\n";
+                }
+            }
+            return retVal;
+        }
         private List<PresentVertexCommand> ConvertCommands(IReadOnlyList<VertexCommand> commands)
         {
-            return commands.Select(x => new PresentVertexCommand{  ParentName = x.ParentName, Operation = x.Operation.ToString(), Ordinate = Math.Round(x.Ordinate, 3)}).ToList();
+            return commands.Select(x => new PresentVertexCommand { ParentName = x.ParentName, Operation = x.Operation.ToString(), Ordinate = Math.Round(x.Ordinate, 3) }).ToList();
         }
         private double ChangeOrientation(double hight, ShelvsDirection direction)
         {
@@ -69,6 +86,6 @@ namespace VisualControlApp
             }
             return hight;
         }
-
+    
     }
 }

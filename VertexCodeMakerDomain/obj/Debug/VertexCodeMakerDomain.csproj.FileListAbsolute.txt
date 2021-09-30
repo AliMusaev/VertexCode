@@ -12,4 +12,3 @@ C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.csproj.CopyComplete
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.dll
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.pdb
-C:\Users\musaev.ae\source\repos\VertexCodeMaker\VertexCodeMakerDomain\obj\Debug\VertexCodeMakerDomain.csproj.AssemblyReference.cache

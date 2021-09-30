@@ -23,11 +23,11 @@ namespace VisualControlApp
         public event PropertyChangedEventHandler PropertyChanged;
         private string _cabinName;
         private string _frameName;
-        public MainWindow(VertexFrame frame)
+        public MainWindow(VertexFrame frame, List<ErrorMessage> errors)
         {
             InitializeComponent();
             VertexSectionAdapter adapter = new VertexSectionAdapter();
-            _sections = adapter.AdaptData(frame);
+            _sections = adapter.AdaptData(frame, errors);
             _frameName = frame.FrameName;
             _cabinName = frame.CabinName;
 

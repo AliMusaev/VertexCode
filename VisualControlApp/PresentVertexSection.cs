@@ -31,7 +31,8 @@ namespace VisualControlApp
         public string Mark { get; set; }
         public string Type { get; set; }
         public bool IsEmpty { get; set; }
-        public List<string> ExceptionsCollection { get; set; }
+        public string ExtensionsString { get; set; }
+        public bool LoadWithError { get; set; }
         public PresentVertexSection()
         {
             IsEmpty = false;

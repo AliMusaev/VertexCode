@@ -7,6 +7,11 @@
         xmlns:local="clr-namespace:VisualControlApp"
         mc:Ignorable="d"
         Title="VertexCode" Height="Auto" Width="Auto">
+
+    <Window.Resources>
+    </Window.Resources>
+
+
     <Grid  Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition MaxWidth="600" Width="auto">
@@ -48,6 +53,7 @@
               ShowsPreview="True"
               Height="2"
            />
+
             <Label Content="Cabin" Margin="10,7,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="62" Grid.Column="0" Grid.Row="0" />
             <TextBox Name="CabinNameField" Height="23" Margin="77,7,0,0" TextWrapping="NoWrap" Text="" VerticalAlignment="Top" TextChanged="CabinNameField_TextChanged" HorizontalAlignment="Left" Width="182"  Grid.Column="0" Grid.Row="0"/>
             <Label Content="Frame" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Width="62" Grid.Column="0" Grid.Row="1"/>
@@ -65,6 +71,26 @@
                     <DataGridTextColumn Header="X2" Binding="{Binding Path = X2}"/>
                     <DataGridTextColumn Header="Y2" Binding="{Binding Path = Y2}"/>
                     <DataGridTextColumn Header="HI" Binding="{Binding Path = HI}"/>
+                    <DataGridTemplateColumn Header="LR" >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Name="errBut" IsEnabled="False" Width="20" Height="20" Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
+                                    <Button.Content>
+                                        <Image x:Name="error" Source="/VisualControlApp;component/Resources/warning.png"/>
+                                    </Button.Content>
+                                </Button>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path = LoadWithError}" Value="False">
+                                        <Setter TargetName="error" Property="Source" Value="/VisualControlApp;component/Resources/check.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path = LoadWithError}" Value="True">
+                                        <Setter TargetName="error" Property="Source" Value="/VisualControlApp;component/Resources/warning.png"/>
+                                        <Setter Property="ToolTip" Value="{Binding Path = ExtensionsString}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
 
                 <DataGrid.RowStyle>
@@ -79,6 +105,18 @@
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
+                <DataGrid.CellStyle >
+                    <Style TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path = HaveError}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path = HaveError}" Value="False">
+                                <Setter Property="Visibility" Value="Hidden"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
 
             </DataGrid>
             <DataGrid Name="commandTable" Margin="10" Grid.Row="4" CanUserSortColumns="False" IsReadOnly="True"  VerticalScrollBarVisibility="Visible">

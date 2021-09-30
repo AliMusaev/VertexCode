@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace NxAssemblyReaderLib.BaseBuilder
 {
@@ -51,7 +52,7 @@ namespace NxAssemblyReaderLib.BaseBuilder
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show($"Attention ContourFlange dont find in {partName}. The program will be closed!");
                 _logger.Error(ex, $"part \"{partName}\" dont contain feature BCFLANGE");
                 throw;
                 
