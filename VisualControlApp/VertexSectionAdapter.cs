@@ -16,18 +16,17 @@ namespace VisualControlApp
         {
             _profileMarker = new ProfileMarker();
         }
-        public List<PresentVertexSection> AdaptData(VertexFrame frame, List<ErrorMessage> messages)
+        public List<PresentVertexSection> AdaptData(VertexFrame frame)
         {
 
             var retVal = new List<PresentVertexSection>();
-            foreach (var item in frame.GetSections())
+            foreach (var item in frame.SectionsCollection)
             {
-
-                retVal.Add(ConvertSection(item, messages));
+                retVal.Add(ConvertSection(item));
             }
             return retVal;
         }
-        private PresentVertexSection ConvertSection(VertexSection section, List<ErrorMessage> messages)
+        private PresentVertexSection ConvertSection(VertexSection section)
         {
             double GA = 0.6;
             int quantity = 1;
@@ -38,10 +37,10 @@ namespace VisualControlApp
             rSection.Mark = _profileMarker.GetNextMark().ToString();
             rSection.SectionName = Convert.ToByte(rSection.Mark[0]).ToString();
             rSection.Width = section.Width;
-            rSection.X1 = Math.Round(section.StartPoint.X, 3);
-            rSection.Y1 = Math.Round(section.StartPoint.Y, 3);
-            rSection.X2 = Math.Round(section.EndPoint.X, 3);
-            rSection.Y2 = Math.Round(section.EndPoint.Y, 3);
+            rSection.X1 = section.StartPoint.X;
+            rSection.Y1 = section.StartPoint.Y;
+            rSection.X2 = section.EndPoint.X;
+            rSection.Y2 = section.EndPoint.Y;
             rSection.HI = ChangeOrientation(section.Height, section.Direction);
             rSection.Direction = section.Direction.ToString();
             rSection.CosX = section.CosX;
@@ -51,23 +50,26 @@ namespace VisualControlApp
             rSection.Length = section.Length;
             rSection.Height = section.Height;
             rSection.Thickness = section.Thickness;
-            rSection.ExtensionsString = FindErrorMessages(messages, section.SectionName);
+            rSection.ExtensionsString = FindErrorMessages(section.SectionName);
             rSection.DE = $"{rSection.Mark}-{rSection.Direction}";
-            rSection.CommandsCollection = ConvertCommands(section.CommandsCollection).OrderBy(x => x.Ordinate).ToList();
+            rSection.AddCommands(ConvertCommands(section.CommandsCollection));
+            rSection.IsOrthogonal = section.IsOrthogonal;
             if (rSection.ExtensionsString != null)
             {
-                MessageBox.Show(rSection.ExtensionsString);
                 rSection.LoadWithError = true;
             }
             return rSection;
+           
+               
 
         }
-        private string FindErrorMessages(List<ErrorMessage> messages, string sectName)
+        private string FindErrorMessages(string sectName)
         {
+            var messages = ErrorMessageStore.GetStore().ErrorsCollection;
             string retVal = null;
             foreach (var item in messages)
             {
-                if (item.SectId == sectName)
+                if (item.SectionName == sectName)
                 {
                     retVal += item.Message + "\n";
                 }
@@ -76,7 +78,7 @@ namespace VisualControlApp
         }
         private List<PresentVertexCommand> ConvertCommands(IReadOnlyList<VertexCommand> commands)
         {
-            return commands.Select(x => new PresentVertexCommand { ParentName = x.ParentName, Operation = x.Operation.ToString(), Ordinate = Math.Round(x.Ordinate, 3) }).ToList();
+            return commands.Select(x => new PresentVertexCommand { ParentName = x.ParentName, Operation = x.Operation, Ordinate = Math.Round(x.Ordinate, 3) }).ToList();
         }
         private double ChangeOrientation(double hight, ShelvsDirection direction)
         {

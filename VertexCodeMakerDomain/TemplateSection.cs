@@ -7,7 +7,7 @@ using VertexCodeMakerDomain.Interfaces;
 
 namespace VertexCodeMakerDomain
 {
-    public class BaseSection : IBaseSection, ICloneable, IReadException
+    public class TemplateSection : ISection, ICloneable, IReadException
     {
         private List<VertexCommand> _commandsCollection;
         public string SectionName { get; }
@@ -19,7 +19,7 @@ namespace VertexCodeMakerDomain
         public int SectionId { get; set; }
         public List<string> ExceptionsCollection { get; set; }
 
-        public BaseSection(string name, List<VertexCommand> commands, double width, double height, double length, double thickness)
+        public TemplateSection(string name, List<VertexCommand> commands, double width, double height, double length, double thickness)
         {
             SectionName = name;
             _commandsCollection = commands;
@@ -29,7 +29,7 @@ namespace VertexCodeMakerDomain
             Thickness = thickness;
             ExceptionsCollection = new List<string>();
         }
-        public BaseSection(string name, List<VertexCommand> commands, double width, double height, double length, double thickness,  List<string> coll)
+        public TemplateSection(string name, List<VertexCommand> commands, double width, double height, double length, double thickness,  List<string> coll)
         {
             SectionName = name;
             _commandsCollection = commands;
@@ -41,7 +41,9 @@ namespace VertexCodeMakerDomain
         }
         public object Clone()
         {
-            return new BaseSection(SectionName, CommandsCollection.Select(x => x.Clone() as VertexCommand).ToList(), Width, Height, Length, Thickness, new List<string>(ExceptionsCollection));
+            return new TemplateSection(SectionName, CommandsCollection.Select(x => x.Clone() as VertexCommand).ToList(), Width, Height, Length, Thickness, new List<string>(ExceptionsCollection));
         }
+
+
     }
 }

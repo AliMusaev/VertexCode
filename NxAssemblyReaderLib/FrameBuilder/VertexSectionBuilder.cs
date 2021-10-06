@@ -1,24 +1,34 @@
-﻿using NXOpen;
+﻿using NLog;
+using NXOpen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using VertexCodeMakerDomain;
 
 namespace NxAssemblyReaderLib.FrameBuilder
 {
     class VertexSectionBuilder
     {
-
-        public VertexSection BuildSectionBy(BaseSection baseSection, Point3d initPoint, Matrix3x3 matrix, SecondAxis axis)
+        private ErrorMessageStore _erStore;
+        private TemplateSection _currentTemplate;
+        private string _currentComponentName;
+        private Logger _logger = LogManager.GetCurrentClassLogger();
+        public VertexSectionBuilder()
         {
-            
+            _erStore = ErrorMessageStore.GetStore();
+        }
+        public VertexSection BuildSectionBy(TemplateSection template, string componentName, Point3d initPoint, Matrix3x3 matrix, SecondAxis axis)
+        {
+            _currentTemplate = template;
+            _currentComponentName = componentName; 
             double[] angles = DefineAngles(matrix, axis);
-            Point2d[] points = DefineExtremePoints(initPoint, matrix, baseSection.Width, baseSection.Height, axis, angles[2], angles[3]);
+            Point2d[] points = DefineExtremePoints(initPoint, matrix, template.Width, template.Height, axis, angles[2], angles[3]);
             ShelvsDirection direction = DefineShelvDirection(angles[2], angles[3]);
 
-            return new VertexSection(baseSection, points[0], points[1], angles, direction);
+            return new VertexSection(template, points[0], points[1], angles, direction);
         }
         private double[] DefineAngles(Matrix3x3 matrix, SecondAxis axis)
         {
@@ -51,26 +61,28 @@ namespace NxAssemblyReaderLib.FrameBuilder
         private ShelvsDirection DefineShelvDirection(double cosY, double sinY)
         {
             double mid = 0.707;
-
-            if (cosY < mid && cosY > -mid && sinY > mid && sinY <= 1)
+            if (cosY <= mid && cosY >= -mid && sinY >= mid && sinY <= 1)
             {
                 return ShelvsDirection.U;
             }
-            else if (cosY < -mid && cosY >= -1 && sinY < mid && sinY > -mid)
+            else if (cosY <= -mid && cosY >= -1 && sinY <= mid && sinY >= -mid)
             {
                 return ShelvsDirection.L;
             }
-            else if (cosY > -mid && cosY < mid && sinY < -mid && sinY >= -1)
+            else if (cosY >= -mid && cosY <= mid && sinY <= -mid && sinY >= -1)
             {
                 return ShelvsDirection.D;
             }
-            else if (cosY > mid && cosY <= 1 && sinY > -mid && sinY < mid)
+            else if (cosY >= mid && cosY <= 1 && sinY >= -mid && sinY <= mid)
             {
                 return ShelvsDirection.R;
             }
             else
             {
-                throw new Exception("Cant handle shelv direction");
+                //MessageBox.Show($"Cant define section Direction in component {_currentComponentName}. Will be set default direction: U");
+                _erStore.AddMessage(new ErrorMessage(_currentComponentName, "Cant define section Direction"));
+                _logger.Warn($"Cant define section Direction in component {_currentComponentName}. Will be set default direction: U");
+                return ShelvsDirection.U;
             }
         }
     }

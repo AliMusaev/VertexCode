@@ -52,12 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseSection.cs" />
+    <Compile Include="ErrorMessageStore.cs" />
+    <Compile Include="TemplateSection.cs" />
     <Compile Include="ErrorMessage.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Interfaces\IAngle.cs" />
     <Compile Include="Interfaces\ICommand.cs" />
-    <Compile Include="Interfaces\IBaseSection.cs" />
+    <Compile Include="Interfaces\ISection.cs" />
     <Compile Include="Interfaces\IDirectable.cs" />
     <Compile Include="Interfaces\IMeasurable.cs" />
     <Compile Include="Interfaces\IReadException.cs" />

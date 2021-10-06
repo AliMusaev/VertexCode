@@ -8,7 +8,17 @@ namespace VertexCodeMakerDomain
 {
     public class ErrorMessage
     {
-        public string SectId { get; set; }
+
+        public string SectionName { get; set; }
         public string Message { get; set; }
+        public ErrorMessage()
+        {
+
+        }
+        public ErrorMessage(string section, string message)
+        {
+            SectionName = section;
+            Message = message;
+        }
     }
 }

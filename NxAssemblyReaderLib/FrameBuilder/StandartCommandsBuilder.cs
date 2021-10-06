@@ -11,19 +11,20 @@ using VertexCodeMakerDomain.Interfaces;
 
 namespace NxAssemblyReaderLib.FrameBuilder
 {
-    class StandartFeaturesFinder
+    class StandartCommandsBuilder
     {
         private Logger _logger = LogManager.GetCurrentClassLogger();
         private Intersection _intersection;
         private double _height;
         private List<VertexCommand> _commands;
-        public StandartFeaturesFinder(Intersection intersection, VertexFrame frame)
+        public StandartCommandsBuilder()
+        {
+
+        }
+        public List<VertexCommand> BuildCommandsAccording(Intersection intersection)
         {
             _intersection = intersection;
             _commands = new List<VertexCommand>();
-        }
-        public List<VertexCommand> FindFeaturesIn()
-        {
 
             _height = Math.Round(DefineHeight(),3);
 
@@ -53,7 +54,7 @@ namespace NxAssemblyReaderLib.FrameBuilder
             }
             else
             {
-                DefineSectionPosition();
+                DefineOrthogonalTeeFeatures(_intersection.Section1, _intersection.Section2, _intersection.Segments);
             }
             
 
@@ -98,8 +99,10 @@ namespace NxAssemblyReaderLib.FrameBuilder
         }
         private void AddChamfer()
         {
+
             if (!_intersection.Section1.IsOrthogonal)
             {
+
                 _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Chamfer, 0));
                 _commands.Add(new VertexCommand(_intersection.Section1.SectionName, Operations.Chamfer, _intersection.Section1.Width));
                 return;
@@ -111,65 +114,82 @@ namespace NxAssemblyReaderLib.FrameBuilder
                 return;
             }
         }
-        private void DefineSectionPosition()
+   
+        private void DefineOrthogonalTeeFeatures(VertexSection sect1, VertexSection sect2, double[] segments)
         {
-            if (_intersection.Segments[0] > _height && _intersection.Segments[1] > _height)
+            if (segments[0] > _height && segments[1] > _height)
             {
-                AddFeatureInSecondSection(DefineSectionPosRelativeIntersectionPoint(_intersection.Section2, _intersection.Segments[2], _intersection.Segments[3]), _intersection.Section1, _intersection.Segments[0]);
+                var pos = DefineSectionPosRelativeIntersectionPoint(sect2, segments[2], segments[3]);
+                AddFeatureInSection(pos, sect1.SectionName, sect1.Direction, segments[0]);
             }
-            else if (_intersection.Segments[2] > _height && _intersection.Segments[3] > _height)
+            else if (segments[2] > _height && segments[3] > _height)
             {
-                AddFeatureInSecondSection(DefineSectionPosRelativeIntersectionPoint(_intersection.Section1, _intersection.Segments[0], _intersection.Segments[1]), _intersection.Section2, _intersection.Segments[2]);
-
+                var pos = DefineSectionPosRelativeIntersectionPoint(sect1, segments[0], segments[1]);
+                AddFeatureInSection(pos, sect2.SectionName, sect2.Direction, segments[2]);
             }
         }
-        private void AddFeatureInSecondSection(string pos, VertexSection sect, double value)
+        /// <summary>
+        ///  According position and distance add new vertex command Notch or Lip (like in requirements)
+        ///  with section name from section
+        /// </summary>
+        /// <param name="pos">Section postion defined by method "DefineSectionPosRelativeIntersectionPoint"</param>
+        /// <param name="sectionName">Section whose must be added new vertex command</param>
+        /// <param name="value">Distance from start section to feature</param>
+        private void AddFeatureInSection(string pos, string  sectionName, ShelvsDirection direction, double value)
         {
             if (pos == "right")
             {
-                if (sect.Direction == ShelvsDirection.L)
+                if (direction == ShelvsDirection.L)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Notch, value));
                 }
-                if (sect.Direction == ShelvsDirection.R)
+                if (direction == ShelvsDirection.R)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Lip, value));
                 }
             }
             if (pos == "left")
             {
-                if (sect.Direction == ShelvsDirection.L)
+                if (direction == ShelvsDirection.L)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Lip, value));
                 }
-                if (sect.Direction == ShelvsDirection.R)
+                if (direction == ShelvsDirection.R)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Notch, value));
                 }
             }
             if (pos == "up")
             {
-                if (sect.Direction == ShelvsDirection.U)
+                if (direction == ShelvsDirection.U)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Lip, value));
                 }
-                else if (sect.Direction == ShelvsDirection.D)
+                else if (direction == ShelvsDirection.D)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Notch, value));
                 }
             }
             if (pos == "down")
             {
-                if (sect.Direction == ShelvsDirection.U)
+                if (direction == ShelvsDirection.U)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Notch, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Notch, value));
                 }
-                else if (sect.Direction == ShelvsDirection.D)
+                else if (direction == ShelvsDirection.D)
                 {
-                    _commands.Add(new VertexCommand(sect.SectionName, Operations.Lip, value));
+                    _commands.Add(new VertexCommand(sectionName, Operations.Lip, value));
                 }
             }
         }
+        /// <summary>
+        /// This method defined section posiotion relative second section. When setion with tee intersection like that "-|"
+        /// "-" it is section whose position need defined. "|"  second secеion relative to which the position is determined.
+        /// </summary>
+        /// <param name="section">Section whose  position need defined</param>
+        /// <param name="segment1">Section segment before intersection</param>
+        /// <param name="segment2">Section segment after intersection</param>
+        /// <returns>Return enum value right left down up</returns>
         private string DefineSectionPosRelativeIntersectionPoint(VertexSection section, double segment1, double segment2)
         {
 
@@ -242,7 +262,6 @@ namespace NxAssemblyReaderLib.FrameBuilder
             double value = CalcLength(section1.StartPoint, midPoint);
             _commands.AddRange(CreateLips(cutoutLength, value, section1.SectionName));
         }
-      
         private List<VertexCommand> CreateLips(double cutoutLength, double pointPosition, string name)
         {
             // TODO: Add atribute instead of hard value
@@ -259,7 +278,6 @@ namespace NxAssemblyReaderLib.FrameBuilder
             }
             return commands;
         }
-       
         private Point2d DefineElementPoint(double hypotenuse, double firstCos, double firstSin, Point2d interPoint, bool isNegative = false)
         {
             if (!isNegative)

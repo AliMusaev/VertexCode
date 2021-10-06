@@ -9,7 +9,7 @@ using VertexCodeMakerDomain.Interfaces;
 
 namespace VertexCodeMakerDomain
 {
-    public class VertexSection : IBaseSection, IAngle, IDirectable, ISectionable
+    public class VertexSection : ISection, IAngle, IDirectable, ISectionable
     {
         private List<VertexCommand> _commandsCollection;
         public string SectionName { get; }
@@ -31,7 +31,7 @@ namespace VertexCodeMakerDomain
         public string Mark { get; set; }
         public List<string> ExceptionsCollection { get; set; }
 
-        public VertexSection(IBaseSection baseSection, Point2d starPoint, Point2d endPoint, double[] angles, ShelvsDirection direction)
+        public VertexSection(ISection baseSection, Point2d starPoint, Point2d endPoint, double[] angles, ShelvsDirection direction)
         {
             SectionName = $"{baseSection.SectionName} {Math.Round(starPoint.X),1}:{Math.Round(starPoint.Y),1} {Math.Round(endPoint.X),1}:{Math.Round(endPoint.Y),1}";
             Width = baseSection.Width;
@@ -52,6 +52,10 @@ namespace VertexCodeMakerDomain
         public void AddCommand(VertexCommand command)
         {
             _commandsCollection.Add(command.Clone() as VertexCommand);
+        }
+        public void AddCommands(List<VertexCommand> commands)
+        {
+            _commandsCollection.AddRange(commands.Select(x=>x.Clone() as VertexCommand).ToArray());
         }
         private bool DefineOrthogonal(double angle1, double angle2)
         {

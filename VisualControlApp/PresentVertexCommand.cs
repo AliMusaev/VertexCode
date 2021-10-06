@@ -1,9 +1,11 @@
-﻿namespace VisualControlApp
+﻿using VertexCodeMakerDomain;
+
+namespace VisualControlApp
 {
-    public class PresentVertexCommand
+    public class PresentVertexCommand 
     {
         public string ParentName { get; set; }
-        public string Operation { get; set; }
+        public Operations Operation { get; set; }
         public double Ordinate { get; set; }
     }
 }

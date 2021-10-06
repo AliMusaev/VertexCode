@@ -3,80 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using VertexCodeMakerDomain.Interfaces;
 
 namespace VertexCodeMakerDomain
 {
     public class VertexFrame
     {
+        private List<VertexSection> _sectionsList;
         public string FrameName { get; }
         public string FrameId { get; set; }
         public string CabinName { get; }
-        private List<VertexSection> _sectionsList;
+        public IReadOnlyList<VertexSection> SectionsCollection { get { return _sectionsList.AsReadOnly(); } }
         public VertexFrame(List<VertexSection> sections, string name, string cabinName = "empty")
         {
             FrameName = name;
             CabinName = cabinName;
             _sectionsList = sections;
         }
-        public IReadOnlyList<VertexSection> GetSections()
-        {
-            return _sectionsList.AsReadOnly();
-        }
         public void AddCommands(List<VertexCommand> commands)
         {
-            foreach (var item in commands)
+            
+            foreach (var item in _sectionsList)
             {
-                _sectionsList.Find(x => x.SectionName == item.ParentName).AddCommand(item);
+                var comms = commands.FindAll(x => x.ParentName == item.SectionName).ToList();
+                var b = comms.Where(x => x.Operation == Operations.Chamfer).GroupBy(y => y.Ordinate).Select(z => z.First()).ToList();
+                comms.RemoveAll(x => x.Operation == Operations.Chamfer);
+                comms.AddRange(b);
+                comms = comms.OrderBy(x => x.Ordinate).ToList();
+                item.AddCommands(comms);
             }
         }
-        public IDirectable GetSectionDirectionByName(string name)
-        {
-            try
-            {
-                return _sectionsList.Find(x => x.SectionName == name);
-            }
-            catch (Exception)
-            {
 
-                throw;
-            }
-        }
-        public ISectionable GetSectionPointsByName(string name)
-        {
-            try
-            {
-                return _sectionsList.Find(x => x.SectionName == name);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-        public IAngle GetSectionAnglesByName(string name)
-        {
-            try
-            {
-                return _sectionsList.Find(x => x.SectionName == name);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-        public IMeasurable GetSectionMeasurementsBy(string name)
-        {
-            try
-            {
-                return _sectionsList.Find(x => x.SectionName == name);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
     }
 }

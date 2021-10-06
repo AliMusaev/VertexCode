@@ -22,25 +22,35 @@ namespace NxAssemblyReaderLib
 {
     public class Program
     {
-        public static List<ErrorMessage> ErMessages { get; set; }
         private static Logger _logger = LogManager.GetCurrentClassLogger();
         private static UI _ui;
         private static Session _session;
+        private static BasePart[] _parts;
+        private static Component[] _components;
         private static VertexFrameBuilder _vBuilder;
-        private static BaseSectionBuilder _bBuilder;
+        
+        private static string _assemblyName;
         private static void InitializeLib()
         {
             // Set environment
             EnvironmentController enviSetter = new EnvironmentController();
             enviSetter.NX1980Set();
-            // Instantiate
-            _vBuilder = new VertexFrameBuilder();
-            _bBuilder = new BaseSectionBuilder();
             // Load Nx session
             _ui = UI.GetUI();
             _session = Session.GetSession();
-            ErMessages = new List<ErrorMessage>();
+            // Load necessary data
+            _components = _session.Parts.Display.ComponentAssembly.RootComponent.GetChildren();
+            _assemblyName = SectionName.Find(_session.Parts.Display.ComponentAssembly.RootComponent.OwningPart);
+            // Fully load of components
+            _session.Parts.LoadOptions.UsePartialLoading = false;
+            _session.Parts.Display.ComponentAssembly.OpenComponents(ComponentAssembly.OpenOption.ComponentOnly, _components, out ComponentAssembly.OpenComponentStatus[] openstatus);
+            _session.Parts.LoadOptions.UsePartialLoading = true;
 
+            // Load parts after loading components
+            _parts = _session.Parts.ToArray().Where(x => _components.Select(y => SectionName.Find(y)).Contains(SectionName.Find(x))).ToArray();
+            // Instantiate
+            _vBuilder = new VertexFrameBuilder();
+            
 
 
         }
@@ -48,7 +58,7 @@ namespace NxAssemblyReaderLib
         {
             var config = LogManager.Configuration;
            
-            var log = new NLog.Targets.FileTarget("logfile1") { FileName = $"u:\\Musaev.Ali\\{Environment.MachineName}.log" };
+            var log = new NLog.Targets.FileTarget("logfile") { FileName = $"u:\\Musaev.Ali\\{Environment.MachineName}.{Environment.UserName}.log" };
             log.Layout = "${longdate}|${level:uppercase=true}|${logger}|${message}|${exception:format=toString}";
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, log);
             LogManager.Configuration = config;
@@ -57,41 +67,84 @@ namespace NxAssemblyReaderLib
         {
             ConfigurateLoggger();
             InitializeLib();
-            var a = _session.Parts.GetDisplayedParts();
-            
-            var assemblyName = FindPartName(_session.Parts.Display.ComponentAssembly.RootComponent.OwningPart);
-           
-            // Get All baseSections
-            List<BaseSection> bSections = _bBuilder.Build(_session.Parts.ToArray(), assemblyName);
-            Component[] assemblyComponents = _session.Parts.Display.ComponentAssembly.RootComponent.GetChildren();
-            // Get all VertexSections (with world coodinate and direction)
-          
-            var frame = _vBuilder.BuildFrameBy(assemblyName, assemblyComponents, bSections);
-            
 
+            var templates = GetTemplates();
+            
+            _components = _components.Where(x => templates.Select(y => y.SectionName).Contains(SectionName.Find(x))).ToArray();
 
-            MainWindow mainwindow = new MainWindow(frame, ErMessages);
+            
+            List<VertexSection> vertexSections = CreateVertexSections(templates, _components, DetermineSecondAxis());
+        
+            VertexFrame frame = _vBuilder.BuildFrameBy(vertexSections, _assemblyName);
+            MainWindow mainwindow = new MainWindow(frame);
             mainwindow.ShowDialog();
         }
 
-        private static string FindPartName(BasePart part)
+        private static List<VertexSection> CreateVertexSections(List<TemplateSection> sections, Component[] components, SecondAxis axis)
         {
-            try
+            VertexSectionBuilder sectionBuilder = new VertexSectionBuilder();
+            List<VertexSection> retVal = new List<VertexSection>();
+            foreach (var component in components)
             {
-                return part.GetUserAttributeAsString("DB_PART_NAME", NXObject.AttributeType.String, -1);
+                try
+                {
+                    var name = SectionName.Find(component);
+                    if (component.OwningPart.Name != name)
+                    {
+                        var template = sections.FirstOrDefault(x => x.SectionName.Equals(name, StringComparison.OrdinalIgnoreCase)).Clone() as TemplateSection;
+                        component.GetPosition(out Point3d point, out Matrix3x3 matrix);
+                        retVal.Add(sectionBuilder.BuildSectionBy(template, name, point, matrix, axis));
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.Warn("Template cannot be find");
+                    continue;
+                }
+              
             }
-            catch (NXException ex)
-            {
-                _logger.Warn(ex, "DB name not found");
-            }
-            return part.Name;
+            return retVal;
         }
-       
+        private static List<TemplateSection> GetTemplates()
+        {
+            TemplateSectionsBuilder templateBuilder = new TemplateSectionsBuilder();
+            List<TemplateSection> templates = new List<TemplateSection>();
+            // Get All templates
+            foreach (var part in _parts)
+            {
+
+                var partName = SectionName.Find(part);
+                if (partName != _assemblyName)
+                {
+                    var template = templateBuilder.Build(part, partName);
+                    if (template != null)
+                    {
+                        templates.Add(templateBuilder.Build(part, partName));
+                    }
+                }
+            }
+            return templates;
+        }
+        private static SecondAxis DetermineSecondAxis()
+        {
+            List<double> results = new List<double>();
+            foreach (var item in _components)
+            {
+                item.GetPosition(out Point3d point, out Matrix3x3 matrix);
+                results.Add(point.Y);
+            }
+
+            var b = results.GroupBy(x => Math.Round(x, 1)).ToList();
+            if (b.Count == 1)
+            {
+                return SecondAxis.Z;
+            }
+            return SecondAxis.Y;
+           
+        }
+
         public static int GetUnloadOption(string arg)
         {
-            
-
-            
             LogManager.Shutdown();
             return ((int)Session.LibraryUnloadOption.Immediately);
         }

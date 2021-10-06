@@ -1,4 +1,5 @@
-﻿using NXOpen;
+﻿using NLog;
+using NXOpen;
 using NXOpen.Features;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace NxAssemblyReaderLib.BaseBuilder
 {
     class FeaturesHandler
     {
+        private Logger _logger = LogManager.GetCurrentClassLogger();
         public T CastNxObjectTo<T>(NXObject obj) where T : NXObject
         {
             try
@@ -21,6 +23,20 @@ namespace NxAssemblyReaderLib.BaseBuilder
 
                 throw new Exception($"Cant cast \"{obj.Name}\" with type {obj.GetType().Name} to {typeof(T).Name}");
             }
+        }
+        public List<T> CastFeaturesTo<T>(List<Feature> features) where T : NXObject
+        {
+            try
+            {
+                return features.Select(x => CastNxObjectTo<T>(x)).ToList();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
         public NXObject[] GetGeometryFrom(Feature feature, int exceptedAmount = 0)
         {
@@ -41,7 +57,7 @@ namespace NxAssemblyReaderLib.BaseBuilder
                 else return geoms;
             }
         }
-        public List<Feature> FindFeaturesBy<T>(BasePart part) where T : class
+        public List<Feature> FindIn<T>(BasePart part) where T : class
         {
             try
             {
@@ -54,7 +70,7 @@ namespace NxAssemblyReaderLib.BaseBuilder
             }
 
         }
-        public List<Feature> FindBy<T>(BasePart part, string name) where T : class
+        public List<Feature> FindIn<T>(BasePart part, string name) where T : class
         {
             try
             {
@@ -68,5 +84,6 @@ namespace NxAssemblyReaderLib.BaseBuilder
             }
 
         }
+       
     }
 }

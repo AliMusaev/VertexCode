@@ -21,16 +21,18 @@ namespace VisualControlApp
         private OutputBuilder _oBuilder;
         private List<PresentVertexSection> _sections;
         public event PropertyChangedEventHandler PropertyChanged;
+        private ErrorMessageStore _errorStore;
         private string _cabinName;
         private string _frameName;
-        public MainWindow(VertexFrame frame, List<ErrorMessage> errors)
+        public MainWindow(VertexFrame frame)
         {
             InitializeComponent();
+            _errorStore = ErrorMessageStore.GetStore();
             VertexSectionAdapter adapter = new VertexSectionAdapter();
-            _sections = adapter.AdaptData(frame, errors);
+            _sections = adapter.AdaptData(frame);
             _frameName = frame.FrameName;
             _cabinName = frame.CabinName;
-
+            
             AdditionalRules ar = new AdditionalRules();
             _sections = ar.AddAddintionalRulesInSections(_sections);
 
@@ -45,6 +47,23 @@ namespace VisualControlApp
             sectionTable.AutoGenerateColumns = false;
           
             _oBuilder = new OutputBuilder();
+            DefineLoadingResult();
+
+        }
+        private void DefineLoadingResult()
+        {
+
+            if (_errorStore.ErrorsCollection == null || _errorStore.ErrorsCollection.Count == 0 )
+            {
+                messageBut.Content = FindResource("check");
+                messageBut.IsEnabled = false;
+                MessageBox.Show("Reading nx model completed successfully");
+                
+            }
+            else
+            {
+                MessageBox.Show("Reading nx model complete with erros.\n Look in log");
+            }
         }
         private void SetHighestAndLowerSections()
         {
@@ -72,7 +91,7 @@ namespace VisualControlApp
             
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.DefaultExt = "txt";
-            saveFileDialog.FileName = "TEST";
+            saveFileDialog.FileName = $"{_cabinName}_{_frameName}";
             saveFileDialog.Filter = "Text files(*.txt)| *.txt | All files(*.*) | *.* ";
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -114,6 +133,12 @@ namespace VisualControlApp
                 sectionTable.IsReadOnly = true;
                 commandTable.IsReadOnly = true;
             }
+        }
+
+        private void messageBut_Click(object sender, RoutedEventArgs e)
+        {
+            MessageWindow messageWindow = new MessageWindow();
+            messageWindow.ShowDialog();
         }
     }
 }

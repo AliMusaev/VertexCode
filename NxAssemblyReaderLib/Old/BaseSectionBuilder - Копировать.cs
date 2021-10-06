@@ -14,9 +14,9 @@ namespace NxAssemblyReaderLib
     class BaseSectionBuilderOld
     {
        
-        public List<BaseSection> Build(BasePart[] parts, Dictionary<Operations, double> servicesList, string assemblyName)
+        public List<TemplateSection> Build(BasePart[] parts, Dictionary<Operations, double> servicesList, string assemblyName)
         {
-            List<BaseSection> bases = new List<BaseSection>();
+            List<TemplateSection> bases = new List<TemplateSection>();
             
             foreach (var item in parts)
             {
@@ -28,15 +28,15 @@ namespace NxAssemblyReaderLib
             }
             return bases;
         }
-        private BaseSection BuildBaseSecionsBy(BasePart part, Dictionary<Operations, double> servicesList)
+        private TemplateSection BuildBaseSecionsBy(BasePart part, Dictionary<Operations, double> servicesList)
         {
-            var retVal = new Dictionary<string, IBaseSection>();
+            var retVal = new Dictionary<string, ISection>();
             
             BaseAttributes bases = GeteSizeAttributeFrom(GetContourFlangeFrom(part));
 
             // Get commands and sort by ordinate distance
             var vertexCommands = GetCommandsFrom(part, bases.Width, servicesList).OrderBy(x => x.Ordinate).ToList();
-            return new BaseSection(part.Name, vertexCommands, bases.Width, bases.Hight, bases.Length, bases.Thickness);
+            return new TemplateSection(part.Name, vertexCommands, bases.Width, bases.Hight, bases.Length, bases.Thickness);
         }
         private List<VertexCommand> GetCommandsFrom(BasePart part, double partWidh, Dictionary<Operations, double> servicesList)
         {
