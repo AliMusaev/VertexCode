@@ -42,7 +42,8 @@ namespace VisualControlApp
             CabinNameField.Text = _cabinName;
 
             PlotModel.Model = new OxyChartBuilder().BuildOxyModel(_sections);
-            
+            var test = new DxfBuilder();
+            test.BuildOxyModel(_sections);
             sectionTable.ItemsSource = _sections;
             sectionTable.AutoGenerateColumns = false;
           

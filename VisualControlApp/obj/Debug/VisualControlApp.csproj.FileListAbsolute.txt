@@ -72,3 +72,5 @@ C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\bin\Debug\NXOpe
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\bin\Debug\NXOpen.Utilities.dll
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\obj\Debug\MessageWindow.g.cs
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\obj\Debug\MessageWindow.baml
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\bin\Debug\netDxf.dll
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\VisualControlApp\bin\Debug\netDxf.xml

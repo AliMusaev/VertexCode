@@ -74,6 +74,9 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
+    <Reference Include="netDxf, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\netDXF.2.2.0.1\lib\net45\netDxf.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.7.11\lib\net45\NLog.dll</HintPath>
     </Reference>
@@ -136,6 +139,7 @@
     <Compile Include="MessageWindow.xaml.cs">
       <DependentUpon>MessageWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DxfBuilder.cs" />
     <Compile Include="PresentVertexSectionEmpty.cs" />
     <Compile Include="VertexSectionAdapter.cs" />
     <Page Include="MainWindow.xaml">

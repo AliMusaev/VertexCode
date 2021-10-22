@@ -46,3 +46,5 @@ C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debu
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debug\NxAssemblyReaderLib.dll.config
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debug\OxyPlot.dll
 C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debug\OxyPlot.xml
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debug\netDxf.dll
+C:\Users\musaev.ae\source\repos\VertexCodeMaker\NxAssemblyReaderLib\bin\x64\Debug\netDxf.xml
